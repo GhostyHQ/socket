@@ -49,6 +49,18 @@ io.on('connection', (socket) => {
 		}
 	})
 
+	socket.on('typingMessage', (data) => {
+		const user = findUser(data.receiverId)
+
+		if (user !== undefined) {
+			socket.to(user.socketId).emit('getTypingMessage', {
+				senderId: data.senderId,
+				receiverId: data.receiverId,
+				message: data.message,
+			})
+		}
+	})
+
 	socket.on('disconnect', () => {
 		console.log('User is disconnected..')
 		removeUser(socket.id)
