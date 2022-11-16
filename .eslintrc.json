@@ -1,0 +1,25 @@
+{
+	"env": {
+		"node": true,
+		"commonjs": true,
+		"es2021": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"prettier",
+		"plugin:import/recommended",
+		"plugin:import/errors",
+		"plugin:import/warnings"
+	],
+	"overrides": [],
+	"parserOptions": {
+		"ecmaVersion": "latest"
+	},
+	"rules": {
+		"linebreak-style": ["error", "unix"],
+		"quotes": ["error", "single"],
+		"semi": ["error", "never"],
+		"import/no-unresolved": [2, { "commonjs": true, "amd": true }],
+		"import/export": 2
+	}
+}
