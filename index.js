@@ -35,9 +35,23 @@ io.on('connection', (socket) => {
 
 	socket.on('sendMessage', (data) => {
 		const user = findUser(data.receiverId)
+		const userCurrent = findUser(data.senderId)
 
 		if (user !== undefined) {
 			socket.to(user.socketId).emit('getMessage', {
+				senderId: data.senderId,
+				receiverId: data.receiverId,
+				message: {
+					text: data.message.text,
+					image: data.message.image,
+				},
+				createAt: data.time,
+			})
+		}
+
+		// handle realtime last message to current user
+		if (userCurrent !== undefined) {
+			socket.to(userCurrent.socketId).emit('getMessageCurrentUser', {
 				senderId: data.senderId,
 				receiverId: data.receiverId,
 				message: {
