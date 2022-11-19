@@ -33,38 +33,9 @@ io.on('connection', (socket) => {
 	console.log('socket server is running...')
 
 	socket.on('addUser', (currentUser, userProfile) => {
+		console.log(`currUser:${currentUser}\nsocketId: ${socket.id}\n${userProfile}\n has connected.`)
 		addUser(currentUser, socket.id, userProfile)
 		io.emit('getUser', users)
-	})
-
-	socket.on('sendMessage', (data) => {
-		const user = findUser(data.receiverId)
-		const userCurrent = findUser(data.senderId)
-
-		if (user !== undefined) {
-			socket.to(user.socketId).emit('getMessage', {
-				senderId: data.senderId,
-				receiverId: data.receiverId,
-				message: {
-					text: data.message.text,
-					image: data.message.image,
-				},
-				createAt: data.time,
-			})
-		}
-
-		// handle realtime last message to current user
-		if (userCurrent !== undefined) {
-			socket.to(userCurrent.socketId).emit('getMessageCurrentUser', {
-				senderId: data.senderId,
-				receiverId: data.receiverId,
-				message: {
-					text: data.message.text,
-					image: data.message.image,
-				},
-				createAt: data.time,
-			})
-		}
 	})
 
 	socket.on('typingMessage', (data) => {
@@ -79,7 +50,64 @@ io.on('connection', (socket) => {
 		}
 	})
 
+	socket.on('sendMessage', (data) => {
+		const user = findUser(data.receiverId)
+		const userCurrent = findUser(data.senderId)
+
+		if (user !== undefined) {
+			socket.to(user.socketId).emit('getMessageReceiver', {
+				senderId: data.senderId,
+				receiverId: data.receiverId,
+				message: {
+					text: data.message.text,
+					image: data.message.image,
+				},
+				createAt: data.time,
+			})
+		}
+
+		// handle realtime last message to current user
+		if (userCurrent !== undefined) {
+			socket.to(userCurrent.socketId).emit('getMessageSender', {
+				senderId: data.senderId,
+				receiverId: data.receiverId,
+				message: {
+					text: data.message.text,
+					image: data.message.image,
+				},
+				createAt: data.time,
+			})
+		}
+	})
+
+	socket.on('deliveredMessage', (data) => {
+		const user = findUser(data.receiverId)
+		const userCurrent = findUser(data.senderId)
+
+		if (user !== undefined) {
+			socket.to(user.socketId).emit('getDeliveredReceiver', data)
+		}
+
+		if (userCurrent !== undefined) {
+			socket.to(userCurrent.socketId).emit('getDeliveredSender', data)
+		}
+	})
+
+	socket.on('seenMessage', (data) => {
+		const user = findUser(data.receiverId)
+		const userCurrent = findUser(data.senderId)
+
+		if (user !== undefined) {
+			socket.to(user.socketId).emit('getSeenReceiver', data)
+		}
+
+		if (userCurrent !== undefined) {
+			socket.to(userCurrent.socketId).emit('getSeenSender', data)
+		}
+	})
+
 	socket.on('logout', (currentUser) => {
+		console.log(`${currentUser} has disconnected.`)
 		userLogout(currentUser)
 	})
 
