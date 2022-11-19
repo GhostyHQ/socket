@@ -25,6 +25,10 @@ const findUser = (receiverId) => {
 	return users.find((user) => user.currentUser === receiverId)
 }
 
+const userLogout = (currentUser) => {
+	users = users.filter((user) => user.currentUser !== currentUser)
+}
+
 io.on('connection', (socket) => {
 	console.log('socket server is running...')
 
@@ -73,6 +77,10 @@ io.on('connection', (socket) => {
 				message: data.message,
 			})
 		}
+	})
+
+	socket.on('logout', (currentUser) => {
+		userLogout(currentUser)
 	})
 
 	socket.on('disconnect', () => {
