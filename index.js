@@ -1,6 +1,17 @@
-const { Server } = require('socket.io')
+const express = require('express')
+const http = require('http')
+const socket = require('socket.io')
 
-const io = new Server(8000, {
+const index = require('./routes/index')
+
+const app = express()
+
+const server = http.createServer(app)
+const PORT = 8000
+
+app.use(index)
+
+const io = socket(server, {
 	cors: {
 		origin: '*',
 		methods: ['GET', 'POST'],
@@ -117,3 +128,5 @@ io.on('connection', (socket) => {
 		io.emit('getUser', users)
 	})
 })
+
+server.listen(PORT, () => console.log(`Listening on port ${PORT}`))
